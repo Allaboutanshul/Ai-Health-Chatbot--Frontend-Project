@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Amartya — AI Health Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="index.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+        <span class="logo-text">Amartya</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
+    <button class="new-chat-btn" onclick="startNewChat()">
+      <i class="fa-solid fa-plus"></i>
+      <span>New Consultation</span>
+    </button>
+
+    <!-- Search History -->
+    <div class="search-history">
+      <input type="text" placeholder="Search conversations..." id="searchInput" class="search-box">
+    </div>
+
+    <div class="chat-history">
+      <p class="history-label">Recent</p>
+
+      <div class="history-item active" onclick="loadConversation(this)">
+        <i class="fa-solid fa-comment-medical"></i>
+        <span>Headache & fever symptoms</span>
+        <button class="delete-history-btn" onclick="event.stopPropagation(); deleteHistory(this)">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      <div class="history-item" onclick="loadConversation(this)">
+        <i class="fa-solid fa-comment-medical"></i>
+        <span>Blood pressure query</span>
+        <button class="delete-history-btn" onclick="event.stopPropagation(); deleteHistory(this)">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      <div class="history-item" onclick="loadConversation(this)">
+        <i class="fa-solid fa-comment-medical"></i>
+        <span>Vitamin D deficiency</span>
+        <button class="delete-history-btn" onclick="event.stopPropagation(); deleteHistory(this)">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      <div class="history-item" onclick="loadConversation(this)">
+        <i class="fa-solid fa-comment-medical"></i>
+        <span>Sleep disorder advice</span>
+        <button class="delete-history-btn" onclick="event.stopPropagation(); deleteHistory(this)">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      <div class="history-item" onclick="loadConversation(this)">
+        <i class="fa-solid fa-comment-medical"></i>
+        <span>Diabetes management</span>
+        <button class="delete-history-btn" onclick="event.stopPropagation(); deleteHistory(this)">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+
+      <p class="history-label">Earlier</p>
+
+      <div class="history-item" onclick="loadConversation(this)">
+        <i class="fa-solid fa-comment-medical"></i>
+        <span>Skin rash consultation</span>
+        <button class="delete-history-btn" onclick="event.stopPropagation(); deleteHistory(this)">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      <div class="history-item" onclick="loadConversation(this)">
+        <i class="fa-solid fa-comment-medical"></i>
+        <span>Nutrition & diet plan</span>
+        <button class="delete-history-btn" onclick="event.stopPropagation(); deleteHistory(this)">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      <div class="history-item" onclick="loadConversation(this)">
+        <i class="fa-solid fa-comment-medical"></i>
+        <span>Back pain relief</span>
+        <button class="delete-history-btn" onclick="event.stopPropagation(); deleteHistory(this)">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-menu-btn" onclick="toggleSettings()">
+        <i class="fa-solid fa-gear"></i>
+        <span>Settings</span>
+      </button>
+      <button class="sidebar-menu-btn" onclick="toggleAbout()">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>About</span>
+      </button>
+      <div class="user-profile">
+        <div class="avatar">R</div>
+        <div class="user-info">
+          <span class="user-name">Rahul Sharma</span>
+          <span class="user-plan">Premium</span>
+        </div>
+        <i class="fa-solid fa-chevron-down"></i>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main" id="main">
+
+    <!-- TOP NAV -->
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="topbar-center">
+        <span class="model-badge">
+          <i class="fa-solid fa-shield-heart"></i>
+          Amartya Health AI v2.0
+        </span>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn notification-btn" title="Notifications">
+          <i class="fa-solid fa-bell"></i>
+          <span class="notification-badge">3</span>
+        </button>
+        <button class="icon-btn" title="Health Summary">
+          <i class="fa-solid fa-chart-line"></i>
+        </button>
+        <button class="icon-btn" title="Settings">
+          <i class="fa-solid fa-sliders"></i>
+        </button>
+        <button class="icon-btn theme-toggle" id="themeToggle" title="Toggle Theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- CHAT AREA -->
+    <section class="chat-area" id="chatArea">
+
+      <!-- WELCOME STATE -->
+      <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-container">
+          <div class="welcome-icon">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <h1 class="welcome-title">How can I help you today?</h1>
+          <p class="welcome-subtitle">
+            I'm Amartya, your personal AI health assistant. Ask me anything about symptoms,
+            medications, nutrition, mental health, or general wellness.
+          </p>
+
+          <!-- Health Stats Widget -->
+          <div class="health-stats">
+            <div class="stat-card">
+              <i class="fa-solid fa-water"></i>
+              <div class="stat-info">
+                <span class="stat-label">Hydration</span>
+                <span class="stat-value">6/8 glasses</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fa-solid fa-person-walking"></i>
+              <div class="stat-info">
+                <span class="stat-label">Steps Today</span>
+                <span class="stat-value">5,342 steps</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fa-solid fa-heart"></i>
+              <div class="stat-info">
+                <span class="stat-label">Heart Rate</span>
+                <span class="stat-value">72 BPM</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="disclaimer-banner">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>For emergencies, call <strong>112</strong> or visit the nearest hospital. I provide health guidance, not medical diagnosis.</span>
+          </div>
+
+          <div class="suggestion-grid">
+            <button class="suggestion-card" onclick="fillInput(this)">
+              <i class="fa-solid fa-thermometer-half"></i>
+              <span>I have a fever and sore throat since 2 days, what could it be?</span>
+            </button>
+            <button class="suggestion-card" onclick="fillInput(this)">
+              <i class="fa-solid fa-brain"></i>
+              <span>What are early signs of high blood pressure?</span>
+            </button>
+            <button class="suggestion-card" onclick="fillInput(this)">
+              <i class="fa-solid fa-apple-whole"></i>
+              <span>Suggest a healthy diet plan for weight loss</span>
+            </button>
+            <button class="suggestion-card" onclick="fillInput(this)">
+              <i class="fa-solid fa-moon"></i>
+              <span>I can't sleep properly. What should I do?</span>
+            </button>
+            <button class="suggestion-card" onclick="fillInput(this)">
+              <i class="fa-solid fa-pills"></i>
+              <span>Is it safe to take ibuprofen daily for back pain?</span>
+            </button>
+            <button class="suggestion-card" onclick="fillInput(this)">
+              <i class="fa-solid fa-heart"></i>
+              <span>How do I improve my mental health and reduce stress?</span>
+            </button>
+          </div>
+
+          <!-- Quick Health Tips -->
+          <div class="quick-tips">
+            <h3>💡 Today's Health Tip</h3>
+            <p>Drinking 8-10 glasses of water daily helps maintain proper hydration, improves energy levels, and supports kidney function. Don't wait until you're thirsty! 💧</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MESSAGES CONTAINER -->
+      <div class="messages-container" id="messagesContainer">
+
+        <!-- AI MESSAGE EXAMPLE -->
+        <div class="message ai-message">
+          <div class="message-avatar ai-avatar">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div class="message-content">
+            <div class="message-header">
+              <span class="sender-name">Amartya</span>
+              <span class="message-time">10:32 AM</span>
+            </div>
+            <div class="message-bubble ai-bubble">
+              <p>Hello! I'm <strong>Amartya</strong>, your AI-powered health assistant. 🩺</p>
+              <p>I'm here to help you with:</p>
+              <ul>
+                <li>Symptom assessment and health queries</li>
+                <li>Medication information and interactions</li>
+                <li>Nutrition, diet, and fitness guidance</li>
+                <li>Mental health and wellness support</li>
+                <li>Chronic disease management tips</li>
+              </ul>
+              <p>Please describe your health concern and I'll do my best to assist you.</p>
+            </div>
+            <div class="message-actions">
+              <button class="action-btn" title="Copy" onclick="copyMessage(this)"><i class="fa-regular fa-copy"></i></button>
+              <button class="action-btn" title="Like" onclick="likeMessage(this)"><i class="fa-regular fa-thumbs-up"></i></button>
+              <button class="action-btn" title="Dislike" onclick="dislikeMessage(this)"><i class="fa-regular fa-thumbs-down"></i></button>
+              <button class="action-btn" title="Share" onclick="shareMessage(this)"><i class="fa-regular fa-share"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- USER MESSAGE EXAMPLE -->
+        <div class="message user-message">
+          <div class="message-content user-content">
+            <div class="message-header user-header">
+              <span class="message-time">10:35 AM</span>
+              <span class="sender-name">You</span>
+            </div>
+            <div class="message-bubble user-bubble">
+              <p>I have a headache and mild fever since yesterday evening. I also feel very tired. What could be causing this?</p>
+            </div>
+          </div>
+          <div class="message-avatar user-avatar">R</div>
+        </div>
+
+        <!-- AI RESPONSE EXAMPLE -->
+        <div class="message ai-message">
+          <div class="message-avatar ai-avatar">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div class="message-content">
+            <div class="message-header">
+              <span class="sender-name">Amartya</span>
+              <span class="message-time">10:35 AM</span>
+            </div>
+            <div class="message-bubble ai-bubble">
+              <p>Based on your symptoms — <strong>headache, mild fever, and fatigue</strong> — here are the most likely possibilities:</p>
+
+              <div class="health-card">
+                <div class="health-card-header">
+                  <i class="fa-solid fa-virus"></i>
+                  <strong>Possible Causes</strong>
+                </div>
+                <ul>
+                  <li><strong>Viral infection (Common Cold/Flu)</strong> — Most likely cause. Usually self-limiting.</li>
+                  <li><strong>Dengue fever</strong> — If fever is high and there's joint pain. Needs attention.</li>
+                  <li><strong>Dehydration</strong> — Can cause headache and fatigue alongside fever.</li>
+                  <li><strong>Stress or exhaustion</strong> — Weakens immunity and causes these symptoms.</li>
+                </ul>
+              </div>
+
+              <div class="health-card warning-card">
+                <div class="health-card-header">
+                  <i class="fa-solid fa-stethoscope"></i>
+                  <strong>What You Should Do</strong>
+                </div>
+                <ul>
+                  <li>Rest well and stay hydrated (8–10 glasses of water/day)</li>
+                  <li>Take paracetamol (500mg) for fever if above 38°C</li>
+                  <li>Avoid cold drinks and oily foods</li>
+                  <li>Monitor temperature every 4–6 hours</li>
+                </ul>
+              </div>
+
+              <div class="alert-box">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span><strong>See a doctor if:</strong> Fever exceeds 39°C, symptoms worsen after 48 hours, or you develop rash, breathing difficulty, or severe body ache.</span>
+              </div>
+            </div>
+            <div class="message-actions">
+              <button class="action-btn" title="Copy" onclick="copyMessage(this)"><i class="fa-regular fa-copy"></i></button>
+              <button class="action-btn" title="Like" onclick="likeMessage(this)"><i class="fa-regular fa-thumbs-up"></i></button>
+              <button class="action-btn" title="Dislike" onclick="dislikeMessage(this)"><i class="fa-regular fa-thumbs-down"></i></button>
+              <button class="action-btn" title="Share" onclick="shareMessage(this)"><i class="fa-regular fa-share"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TYPING INDICATOR (hidden by default) -->
+        <div class="message ai-message typing-indicator-wrapper" id="typingIndicator" style="display:none;">
+          <div class="message-avatar ai-avatar">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div class="message-content">
+            <div class="message-bubble ai-bubble typing-bubble">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- INPUT AREA -->
+    <footer class="input-area">
+      <div class="input-wrapper">
+        <div class="input-box">
+          <button class="attach-btn" title="Attach file" onclick="attachFile()">
+            <i class="fa-solid fa-paperclip"></i>
+          </button>
+          <textarea
+            id="userInput"
+            class="message-input"
+            placeholder="Describe your symptoms or ask a health question..."
+            rows="1"
+            onInput="autoResize(this)"
+            onKeyDown="handleKeyDown(event)"
+          ></textarea>
+          <button class="voice-btn" title="Voice input" onclick="toggleVoice()">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+        <p class="input-disclaimer">
+          <i class="fa-solid fa-shield-halved"></i>
+          Amartya provides health information only. Always consult a licensed physician for diagnosis and treatment.
+        </p>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- ========== MODALS ========== -->
+
+  <!-- Settings Modal -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="close-modal" onclick="toggleSettings()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-section">
+          <h3>Preferences</h3>
+          <label class="setting-option">
+            <input type="checkbox" checked>
+            <span>Enable Notifications</span>
+          </label>
+          <label class="setting-option">
+            <input type="checkbox" checked>
+            <span>Save Chat History</span>
+          </label>
+          <label class="setting-option">
+            <input type="checkbox">
+            <span>Dark Mode</span>
+          </label>
+        </div>
+        <div class="settings-section">
+          <h3>Health Profile</h3>
+          <input type="text" placeholder="Age" class="setting-input">
+          <input type="text" placeholder="Blood Type" class="setting-input">
+          <textarea placeholder="Allergies & Medical History" class="setting-input"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="toggleSettings()">Cancel</button>
+        <button class="btn-save">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Modal -->
+  <div class="modal" id="aboutModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>About Amartya</h2>
+        <button class="close-modal" onclick="toggleAbout()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="about-content">
+          <h3>🏥 Amartya Health AI v2.0</h3>
+          <p>Your Personal AI-Powered Health Assistant</p>
+          <p>Amartya is designed to provide accessible health information and guidance to help you understand your body better and make informed health decisions.</p>
+          <div class="about-features">
+            <h4>Features:</h4>
+            <ul>
+              <li>✅ Symptom Assessment</li>
+              <li>✅ Health Condition Information</li>
+              <li>✅ Medication Guidance</li>
+              <li>✅ Lifestyle & Wellness Tips</li>
+              <li>✅ Health Record Tracking</li>
+              <li>✅ 24/7 Availability</li>
+            </ul>
+          </div>
+          <p><strong>Version:</strong> 2.0</p>
+          <p><strong>Last Updated:</strong> June 2024</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Panel -->
+  <div class="notification-panel" id="notificationPanel">
+    <div class="notification-header">
+      <h3>Notifications</h3>
+      <button onclick="closeNotifications()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="notification-list">
+      <div class="notification-item">
+        <i class="fa-solid fa-bell"></i>
+        <div class="notification-text">
+          <p>Take your daily medications</p>
+          <span>2 hours ago</span>
+        </div>
+      </div>
+      <div class="notification-item">
+        <i class="fa-solid fa-droplet"></i>
+        <div class="notification-text">
+          <p>Remember to drink water!</p>
+          <span>30 minutes ago</span>
+        </div>
+      </div>
+      <div class="notification-item">
+        <i class="fa-solid fa-heart"></i>
+        <div class="notification-text">
+          <p>Your weekly health summary is ready</p>
+          <span>1 day ago</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
