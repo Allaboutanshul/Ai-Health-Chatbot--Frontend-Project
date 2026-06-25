@@ -27,16 +27,6 @@ Live Demo: `[Insert Live Deployment Link Here - e.g., GitHub Pages/Vercel]`
 
 ---
 
-## 📸 Interface Preview
-
-*(Once your repository is up, add a screenshot here to boost your profile appeal!)*
-```🖼️ `[Insert screenshot or GIF of the chat interface here]`
-
----
-
-## 🚀 Getting Started
-
-To run this project locally, simply clone the repository and open the HTML file:
 
 1. **Clone the repository:**
    ```bash
